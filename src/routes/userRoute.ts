@@ -1,5 +1,5 @@
 import expess from 'express';
-import {deleteUser, getAllUsers, modifyUser, searchUsers, modifyRole, modifyActif, getLoginUser } from '../controller/UserController';
+import {deleteUser, getAllUsers, modifyUser, searchUsers, modifyRole, modifyActif, getUserById, getMe } from '../controller/UserController';
 import { verifyTokenMiddleware } from '../middlewares/verifyToken';
 import { isAdmin } from '../middlewares/verifyRole';
 
@@ -253,7 +253,9 @@ router.delete('/:id', deleteUser, verifyTokenMiddleware);
  *                   type: string
  *                   example: "Erreur interne du serveur"
  */
-router.get('/me', verifyTokenMiddleware, getLoginUser)
+router.get('/user/:id', verifyTokenMiddleware, getUserById);
+
+router.get('/me', verifyTokenMiddleware, getMe)
 
 router.get('/search', searchUsers, verifyTokenMiddleware);
 

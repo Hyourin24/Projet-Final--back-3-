@@ -118,8 +118,9 @@ export async function getFollower(req: AuthRequest, res: Response) {
     }
 
     const abonnes = await Follower.findAll({
-      where: { abonne_id: user_id },
+      where: { user_id },
     });
+
 
     res.status(200).json(abonnes);
     return

@@ -1,5 +1,5 @@
 import express from 'express'
-import { createPost, modifyPost, getAllPostByUserWithComm, getAllPostByUser, getPostById, deletePost, getPostMe } from '../controller/PostController'
+import { createPost, modifyPost, getAllPost, getPostById, deletePost, getAllPostByUser} from '../controller/PostController'
 import { verifyTokenMiddleware } from '../middlewares/verifyToken';
 
 
@@ -45,99 +45,10 @@ const router = express.Router();
  */
 router.post("/",  verifyTokenMiddleware, createPost);
 
-/**
- * @swagger
- * /post/{id}:
- *   put:
- *     summary: Modifier un post
- *     description: Met à jour un post existant.
- *     tags:
- *       - Posts
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID du post à modifier
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               titre:
- *                 type: string
- *                 description: Nouveau titre du post
- *               post:
- *                 type: string
- *                 description: Nouveau contenu du post
- *     responses:
- *       200:
- *         description: Post modifié avec succès
- *       404:
- *         description: Post non trouvé
- *       500:
- *         description: Erreur serveur
- */
 router.put("/:id", verifyTokenMiddleware, modifyPost);
 
-/**
- * @swagger
- * /post/{user_id}:
- *   get:
- *     summary: Récupérer tous les posts d'un utilisateur
- *     description: Renvoie tous les posts créés par un utilisateur spécifique.
- *     tags:
- *       - Posts
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de l'utilisateur
- *     responses:
- *       200:
- *         description: Liste des posts
- *       404:
- *         description: Utilisateur non trouvé
- *       500:
- *         description: Erreur serveur
- */
-router.get("/:user_id", verifyTokenMiddleware, getAllPostByUser);
+router.get("/all", verifyTokenMiddleware, getAllPost);
 
-/**
- * @swagger
- * /post/withComments/{user_id}:
- *   get:
- *     summary: Récupérer tous les posts d'un utilisateur avec leurs commentaires
- *     description: Renvoie tous les posts créés par un utilisateur avec les commentaires associés.
- *     tags:
- *       - Posts
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de l'utilisateur
- *     responses:
- *       200:
- *         description: Liste des posts avec commentaires
- *       404:
- *         description: Utilisateur non trouvé
- *       500:
- *         description: Erreur serveur
- */
-router.get("/withComments/:user_id", verifyTokenMiddleware, getAllPostByUserWithComm);
 
 /**
  * @swagger
@@ -193,9 +104,7 @@ router.get("/:id", verifyTokenMiddleware, getPostById);
  */
 router.delete("/:id", verifyTokenMiddleware, deletePost);
 
-router.get("/", verifyTokenMiddleware, getPostMe)
-
-
+router.get("/user/:user_id", verifyTokenMiddleware, getAllPostByUser);
 
 
 export default router;

@@ -110,25 +110,17 @@ export async function getAllUsers(req: Request, res: Response) {
     }
 }
 
-export async function getLoginUser(req: AuthRequest, res: Response) {
+export async function getUserById(req: AuthRequest, res: Response) {
     try {
-        const userId = req.user?.id;
+        const {id} = req.params
+        const user = await Utilisateur.findByPk(id);
 
-        if (!userId) {
-            res.status(401).json({ message: "Non autorisé. Utilisateur non authentifié." });
-            return;
-        }
-
-        const userLogin = await Utilisateur.findOne({
-            where: { id: userId },
-        });
-
-        if (!userLogin) {
+        if (!user) {
             res.status(404).json({ message: "Utilisateur introuvable." });
             return;
         }
 
-        res.status(200).json(userLogin);
+        res.status(200).json(user);
         return;
     } catch (error) {
         res.status(500).json({ message: "Erreur interne du serveur." });
@@ -190,6 +182,27 @@ export async function deleteUser(req: Request, res: Response) {
         res.json({ message: "Utilisateur supprimé avec succès" });
     } catch (error) {
         console.error("Erreur lors de la suppression :", error);
+        res.status(500).json({ message: "Erreur du serveur" });
+    }
+}
+
+export async function getMe(req: AuthRequest, res: Response) {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ message: "Non autorisé" });
+            return
+        }
+
+        const utilisateur = await Utilisateur.findOne({ where: { id: userId } });
+        if (!utilisateur) {
+            res.status(404).json({ message: "Utilisateur non trouvé" });
+            return
+        }
+
+        res.json(utilisateur);
+    } catch (error) {
+        console.error("Erreur lors de la récupération de l'utilisateur :", error);
         res.status(500).json({ message: "Erreur du serveur" });
     }
 }

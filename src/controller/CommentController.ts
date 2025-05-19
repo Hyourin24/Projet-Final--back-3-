@@ -66,6 +66,19 @@ export async function createComment(req: AuthRequest, res: Response) {
     }
 }
 
+export async function getAllCommentByPost(req: Request, res: Response) {
+    try {
+        const { post_id } = req.params;
+        const utilisateursSession = await Commentaire.findAll({where: { post_id }});
+        if (!utilisateursSession) {
+            res.status(404).json({ message: "Post non trouvé"})
+        }
+        res.send(utilisateursSession);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 export async function getAllCommentByUser(req: Request, res: Response) {
     try {
         const { user_id } = req.params;

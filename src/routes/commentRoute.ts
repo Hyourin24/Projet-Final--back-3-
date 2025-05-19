@@ -1,5 +1,5 @@
 import express from "express";
-import { createComment, getAllCommentByUser, modifyComment, deleteComment, getCommentById  } from "../controller/CommentController";
+import { createComment, getAllCommentByUser, modifyComment, deleteComment, getCommentById, getAllCommentByPost  } from "../controller/CommentController";
 import { verifyTokenMiddleware } from "../middlewares/verifyToken";
 
 const router = express.Router();
@@ -41,6 +41,8 @@ const router = express.Router();
  *         description: Erreur serveur
  */
 router.post("/", verifyTokenMiddleware, createComment);
+
+router.get("/:post_id", verifyTokenMiddleware, getAllCommentByPost);
 
 /**
  * @swagger
