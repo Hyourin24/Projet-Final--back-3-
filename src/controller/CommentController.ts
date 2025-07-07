@@ -13,8 +13,9 @@ interface AuthRequest extends Request {
 export async function createComment(req: AuthRequest, res: Response) {
     try {
         // Validation des champs
-        const { comment, post_id } = validateSchema(req, commentSchema);
+        const { comment } = validateSchema(req, commentSchema);
         let user_id = req.user?.id;
+        const post_id = Number(req.params.post_id);
 
         const utilisateurExistant = await Utilisateur.findByPk(user_id);
         const postExistant = await Post.findByPk(post_id);
@@ -25,14 +26,6 @@ export async function createComment(req: AuthRequest, res: Response) {
         if (!utilisateurExistant) {
             res.status(403).json({ message: "Utilisateur non valide." });
             return
-        }
-        if (req.body.user_id && req.body.user_id !== user_id) {
-            
-            if (!utilisateurExistant || !utilisateurExistant.isAdmin) { 
-                res.status(403).json({ message: "Vous ne pouvez pas créer un commentaire pour un autre utilisateur." });
-                return
-            }
-            user_id = req.body.user_id; 
         }
         if (req.body.post_id && req.body.post_id !== post_id) {
            if (!postExistant || !utilisateurExistant.isAdmin) {
@@ -54,14 +47,15 @@ export async function createComment(req: AuthRequest, res: Response) {
             res.status(400).send('Le commentaire est incomplet.');
             return 
         }
-        if (!post_id || !user_id) {
-            throw new Error("post_id et user_id sont requis");
+        if (!user_id) {
+            throw new Error("user_id est requis");
         }
         const commentUser = await Commentaire.create({ post_id, comment, user_id });
         res.json(commentUser);
     } catch (err: any) {
         // Gestion des erreurs
         res.status(500).json({ message: 'Erreur interne', error: err.message });
+        
 
     }
 }

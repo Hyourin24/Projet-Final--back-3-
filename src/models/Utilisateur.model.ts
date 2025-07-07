@@ -6,7 +6,7 @@ import Follower from "./Follower.model";
 
 enum Actif {
     actif = 'Actif',
-    suspendu = 'Suspendu',
+    banni = 'Banni',
 }
 
 enum Etat {
@@ -93,7 +93,7 @@ Utilisateur.init(
             },
         },
         actif: {
-            type: DataTypes.ENUM("Actif", "Suspendu", "Banni"),
+            type: DataTypes.ENUM("Actif", "Banni"),
             defaultValue: "Actif",
         },
         role: {
@@ -129,3 +129,4 @@ God.hasOne(Utilisateur, {foreignKey: "god_id", as: "god"});
 
 
 export default Utilisateur;
+export { Actif };

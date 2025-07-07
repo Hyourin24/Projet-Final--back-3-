@@ -14,7 +14,7 @@ interface CommentAttributes {
 }
 
 
-class Commentaire extends  Model<CommentAttributes> 
+class Commentaires extends  Model<CommentAttributes> 
     implements CommentAttributes {
     public id?: number;
     public readonly user_id!: number;
@@ -26,7 +26,7 @@ class Commentaire extends  Model<CommentAttributes>
 }
 
 
-Commentaire.init({
+Commentaires.init({
     id: {
          type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -58,13 +58,13 @@ Commentaire.init({
 },
  {
     sequelize,
-    modelName: "Commentaire",
+    modelName: "Commentaires",
     timestamps: true,
 });
 
-Commentaire.belongsTo(Utilisateur, { foreignKey: "user_id" });
-Utilisateur.hasMany(Commentaire, { foreignKey: "user_id" });
+Commentaires.belongsTo(Utilisateur, { foreignKey: "user_id" });
+Utilisateur.hasMany(Commentaires, { foreignKey: "user_id" });
 
-Commentaire.belongsTo(Post, {foreignKey: "post_id"});
-Post.hasMany(Commentaire, {foreignKey: "post_id", as: "commentaires"});
-export default Commentaire;
+Commentaires.belongsTo(Post, {foreignKey: "post_id"});
+Post.hasMany(Commentaires, {foreignKey: "post_id", as: "commentaires"});
+export default Commentaires;

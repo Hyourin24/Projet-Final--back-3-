@@ -40,7 +40,7 @@ const router = express.Router();
  *       500:
  *         description: Erreur serveur
  */
-router.post("/", verifyTokenMiddleware, createComment);
+router.post("/:post_id", verifyTokenMiddleware, createComment);
 
 router.get("/:post_id", verifyTokenMiddleware, getAllCommentByPost);
 
@@ -135,7 +135,7 @@ router.put("/:id", verifyTokenMiddleware, modifyComment);
  *       500:
  *         description: Erreur serveur
  */
-router.delete("/:id", verifyTokenMiddleware, deleteComment);
+router.delete("/:id", deleteComment);
 
 /**
  * @swagger

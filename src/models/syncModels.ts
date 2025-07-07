@@ -1,5 +1,8 @@
 import sequelize from "../config/database";
-import Commentaire from "./Comment.model";
+import ChatSession from "./ChatSession.model";
+import Chats from "./Chats.model";
+import Commentaires from "./Comment.model";
+
 import Follower from "./Follower.model";
 import God from "./God.models";
 import Post from "./Post.model";
@@ -19,4 +22,4 @@ const syncDatabase = async () => {
         console.log("Modèles chargés dans Sequelize:", sequelize.models);
     }
 };
-export { syncDatabase,  Utilisateur, Follower, God, Session, Post, Commentaire};
+export { syncDatabase,  Utilisateur, Follower, God, Session, Post, Commentaires, ChatSession, Chats};

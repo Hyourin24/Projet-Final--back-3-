@@ -9,17 +9,20 @@ import userRoute from './routes/userRoute';
 import sessionRoute from './routes/sessionRoute';
 import postRoute from './routes/postRoute';
 import commentRoute from './routes/commentRoute';
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import chatSessionRoute from './routes/chatSessionRoute';
+import { v2 as cloudinary } from 'cloudinary';
 import godRoute from './routes/godRoute';
 import cors from 'cors';
-import { followUser } from './controller/FollowerController';
 import followRoute from './routes/followRoute';
+import chatRoute from './routes/chatRoute';
 
 cloudinary.config({
     cloud_name: 'dhsf409o1',
     api_key: '317442182697478',
     api_secret: 'x37XaPmNXdQKa9huxGq2MJ8_R-A'
 });
+
+
 
 
 dotenv.config();
@@ -33,6 +36,11 @@ app.use(cors({
   origin: 'http://localhost:4200', // ou '*' pour tester
   credentials: true
 }));
+
+const server = app.listen(PORT, () => {
+  console.log(`📡 Serveur HTTP + WebSocket lancé sur http://localhost:${PORT}`);
+});
+
 
 
 app.use(express.json({ limit: '10mb' }));
@@ -49,6 +57,8 @@ app.use('/post', postRoute)
 app.use('/comment', commentRoute)
 app.use('/god', godRoute)
 app.use('/follow', followRoute)
+app.use('/chat', chatRoute)
+app.use('/chatSession', chatSessionRoute)
 
 
 //app.listen indique au serveur d'écouter les requêtes HTTP arrivant sur le
@@ -56,9 +66,6 @@ app.use('/follow', followRoute)
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.listen(PORT, () => {
-console.log(`Server is running on http://localhost:${PORT}`);
-});
 
 
 

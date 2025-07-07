@@ -5,6 +5,7 @@ import { validateSchema } from "../utils/joiUtils";
 import { hashPassword, verifyPassword } from "../utils/pwdUtils";
 import { loginSchema, registerSchema } from "../JoiValidator/AuthValidator";
 import { generateToken } from "../utils/JWTutils";
+import { Actif } from "../models/Utilisateur.model";
 import God from "../models/God.models";
 
 interface AuthRequest extends Request {
@@ -67,14 +68,9 @@ export async function login(req:Request, res:Response){
             return 
         }
 
-        if (user.actif === "Suspendu" && user.bannedUntil) {
-            if (new Date() > user.bannedUntil) {
-                user.bannedUntil = null;
-                await user.save();
-            } else {
-                res.status(403).json({ message: "Compte temporairement suspendu jusqu'à " + user.bannedUntil });
-                return
-            }
+        if (user.actif === "Banni" ) {
+            res.status(403).json({ message: "Compte temporairement suspendu jusqu'à " + user.bannedUntil });
+            return         
         }
 
         //Vérification du mot de passe hashé selon l'utilisateur
@@ -220,7 +216,7 @@ export async function searchUsers(req: Request, res: Response) {
         //Créé une requête formatée pour que sequelize puisse insérer des variables à l'intérieur
         const query = `
             SELECT id, pseudo, email, "createdAt"
-            FROM utilisateurs
+            FROM "Utilisateur"
             WHERE
                 (:pseudo IS NULL OR pseudo ILIKE :pseudo) AND
                 (:email IS NULL OR email ILIKE :email) AND
@@ -271,29 +267,23 @@ export async function modifyRole(req: Request, res: Response) {
 
 export async function modifyActif(req: Request, res: Response) {
     try {
-        const { id } = req.params;
-        const { actif, banDuration } = req.body;
-
-        const utilisateur = await Utilisateur.findByPk(id);
-        if (!utilisateur) {
-            res.status(404).json({ message: "Utilisateur non trouvé" });
-            return
-        }
-        if (actif === "Suspendu" && banDuration) {
-            const banTime = new Date();
-            banTime.setMinutes(banTime.getMinutes() + parseInt(banDuration)); // ou .setHours(...) si tu préfères
-            utilisateur.bannedUntil = banTime;
-        } else if (actif === "Actif") {
-            utilisateur.bannedUntil = null; // retrait du bannissement
-        }
-        
-        // Mise à jour des champs fournis
-        if (actif) utilisateur.actif = actif;
-
-        await utilisateur.save();
-        res.status(200).json({ message: "Utilisateur modifié avec succès", utilisateur });
+      const { id } = req.params;
+  
+      const utilisateur = await Utilisateur.findByPk(id);
+      if (!utilisateur) {
+        res.status(404).json({ message: "Utilisateur non trouvé" });
+        return
+      }
+  
+      // Inversion de l'état actif/inactif
+      utilisateur.actif = utilisateur.actif === Actif.actif ? Actif.banni : Actif.actif;
+  
+      await utilisateur.save();
+  
+      res.status(200).json({ message: "Utilisateur modifié avec succès", utilisateur });
     } catch (error) {
-        console.error("Erreur lors de la modification :", error);
-        res.status(500).json({ message: "Erreur sur serveur" });
+      console.error("Erreur lors de la modification :", error);
+      res.status(500).json({ message: "Erreur sur serveur" });
     }
-}
+  }
+  

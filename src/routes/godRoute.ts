@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/", verifyTokenMiddleware, isAdmin, createGod);
 router.put("/:id", verifyTokenMiddleware, isAdmin, modifyGod);
-router.delete("/:id", verifyTokenMiddleware, isAdmin, deleteGod);
+router.delete("/:id",  deleteGod);
 router.get("/", getAllGod);
 
 export default router;
