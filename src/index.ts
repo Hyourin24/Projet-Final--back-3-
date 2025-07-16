@@ -29,10 +29,13 @@ const app = express();
 const PORT = 3000;
 console.log("lancement du serveur")
 
-app.use(cors({
-  origin: process.env.CLIENT_URL, // ou '*' pour tester
-  credentials: true
-}));
+const corsOptions = {
+  origin: process.env.CLIENT_URL, 
+  methods: 'GET,POST,DELETE,PUT', 
+  allowedHeaders: ["Content-Type", "Authorization"], 
+  credentials: true, 
+};
+app.use(cors(corsOptions));
 
 const server = app.listen(PORT, () => {
   console.log(`📡 Serveur HTTP + WebSocket lancé sur http://localhost:${PORT}`);
