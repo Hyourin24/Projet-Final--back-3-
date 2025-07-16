@@ -4,7 +4,9 @@
   "description": "Ce projet est le projet final",
   "main": "index.js",
   "scripts": {
+    "prod": "npx tsc && node dist/index.js",
     "start": "nodemon src/index.ts --legacy-watch",
+    "build": "tsc",
     "debug": "npx nodemon --legacy-watch --ext ts src --exec 'node --inspect=0.0.0.0:9229 -r ts-node/register --nolazy' src/index.ts",
     "test": "npx jest --config src/config/jest.config.ts"
   },

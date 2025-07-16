@@ -30,7 +30,7 @@ const PORT = 3000;
 console.log("lancement du serveur")
 
 app.use(cors({
-  origin: 'http://localhost:4200', // ou '*' pour tester
+  origin: process.env.CLIENT_URL, // ou '*' pour tester
   credentials: true
 }));
 

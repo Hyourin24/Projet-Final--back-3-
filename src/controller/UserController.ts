@@ -71,7 +71,10 @@ export async function login(req:Request, res:Response){
         }
         const token = generateToken({id:user.id, role: user.role});
         console.log("DEBUG - Token généré :", token);
-        res.cookie("jwt", token, {httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production"
+        res.cookie("jwt", token, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            secure: process.env.NODE_ENV === "production"
         });
 
         
