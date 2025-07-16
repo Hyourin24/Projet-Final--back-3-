@@ -6,9 +6,9 @@ import { isAdmin } from "../middlewares/verifyRole";
 
 const router = express.Router();
 
-router.post("/", verifyTokenMiddleware, isAdmin, createGod);
-router.put("/:id", verifyTokenMiddleware, isAdmin, modifyGod);
-router.delete("/:id",  deleteGod);
+router.post("/", isAdmin, createGod);
+router.put("/:id", isAdmin, modifyGod);
+router.delete("/:id", isAdmin, deleteGod);
 router.get("/", getAllGod);
 
 export default router;

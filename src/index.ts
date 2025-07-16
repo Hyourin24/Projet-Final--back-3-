@@ -22,9 +22,6 @@ cloudinary.config({
     api_secret: 'x37XaPmNXdQKa9huxGq2MJ8_R-A'
 });
 
-
-
-
 dotenv.config();
 
 const app = express();

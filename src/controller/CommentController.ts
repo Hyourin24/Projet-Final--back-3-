@@ -7,7 +7,7 @@ import Post from "../models/Post.model";
 
 
 interface AuthRequest extends Request {
-    user?: { id: number };
+    user?: { id: number};
 }
 
 export async function createComment(req: AuthRequest, res: Response) {
@@ -62,16 +62,21 @@ export async function createComment(req: AuthRequest, res: Response) {
 
 export async function getAllCommentByPost(req: Request, res: Response) {
     try {
-        const { post_id } = req.params;
-        const utilisateursSession = await Commentaire.findAll({where: { post_id }});
-        if (!utilisateursSession) {
-            res.status(404).json({ message: "Post non trouvé"})
-        }
-        res.send(utilisateursSession);
+        const post_id = parseInt(req.params.post_id);
+
+      if (!post_id) {
+        res.status(404).json({message: "pas d'id de post trouvé"})
+      }
+
+      const commentaires = await Commentaire.findAll({ where: { post_id } });
+  
+      res.status(200).json(commentaires);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+      console.error("Erreur dans getAllCommentByPost:", error);
+      res.status(500).json({ message: 'Erreur interne', error: error.message });
     }
-}
+  }
+  
 
 export async function getAllCommentByUser(req: Request, res: Response) {
     try {
@@ -108,30 +113,56 @@ export async function modifyComment(req: Request, res: Response) {
     }
 }
 
-export async function deleteComment(req: Request, res: Response) {
-    try {
-        const {id } = req.params;
+export async function deleteComment(req: AuthRequest, res: Response) {
+  try {
+    const user_id = req.user?.id;
+    const { id } = req.params;
 
-        const commentUser = await Commentaire.findByPk(id);
-        if (!commentUser) {
-            res.status(404).json({ message: "Commentaire non trouvé" });
-            return
-        }
-
-        await commentUser.destroy();
-        res.json({ message: "Commentaire supprimé avec succès" });
-    } catch (error) {
-        console.error("Erreur lors de la suppression :", error);
-        res.status(500).json({ message: "Erreur serveur" });
+    const commentUser = await Commentaire.findByPk(id);
+    if (!commentUser) {
+      res.status(404).json({ message: "Commentaire non trouvé" });
+      return
     }
+
+    if ((commentUser.user_id) !== (user_id)) {
+      res.status(403).json({ message: "Vous ne pouvez supprimer que vos propres commentaires." });
+      return
+    }
+
+    await commentUser.destroy();
+    res.json({ message: "Commentaire supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
 }
+
 
 export async function getCommentById(req: Request, res: Response) {
     try {
         const { id } = req.params;
-        const utilisateursComment = await Utilisateur.findByPk(id);
+        const utilisateursComment = await Commentaire.findByPk(id);
         res.send(utilisateursComment);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "Erreur serveur" });
     }
 }
+
+export async function deleteCommentAdmin(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const commentUser = await Commentaire.findByPk(id);
+    if (!commentUser) {
+      res.status(404).json({ message: "Commentaire non trouvé" });
+      return
+    }
+
+    await commentUser.destroy();
+    res.json({ message: "Commentaire supprimé avec succès par l'admin." });
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+

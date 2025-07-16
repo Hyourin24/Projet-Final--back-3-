@@ -1,19 +1,34 @@
 import express from "express";
-import { createComment, getAllCommentByUser, modifyComment, deleteComment, getCommentById, getAllCommentByPost  } from "../controller/CommentController";
+import { createComment, getAllCommentByUser, modifyComment, deleteComment, getCommentById, getAllCommentByPost, deleteCommentAdmin  } from "../controller/CommentController";
 import { verifyTokenMiddleware } from "../middlewares/verifyToken";
+import { isAdmin } from "../middlewares/verifyRole";
 
 const router = express.Router();
 
+router.get("/:id", verifyTokenMiddleware, getCommentById);
+
 /**
  * @swagger
- * /comment:
+ * tags:
+ *   - name: Comment
+ *     description: Gestion des commentaires
+ */
+
+/**
+ * @swagger
+ * /comment/{post_id}:
  *   post:
- *     summary: Créer un commentaire
- *     description: Ajoute un commentaire à un post donné
- *     tags:
- *       - Commentaires
+ *     summary: Créer un commentaire pour un post
+ *     tags: [Comment]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: post_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du post concerné
  *     requestBody:
  *       required: true
  *       content:
@@ -21,45 +36,39 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - post_id
  *               - comment
  *             properties:
- *               post_id:
- *                 type: integer
- *                 description: ID du post à commenter
  *               comment:
  *                 type: string
- *                 description: Contenu du commentaire
  *     responses:
- *       201:
+ *       200:
  *         description: Commentaire créé avec succès
  *       400:
- *         description: Erreur de validation
+ *         description: Erreur de validation ou utilisateur invalide
  *       403:
- *         description: Non autorisé
+ *         description: Action interdite
  *       500:
  *         description: Erreur serveur
  */
+
 router.post("/:post_id", verifyTokenMiddleware, createComment);
 
-router.get("/:post_id", verifyTokenMiddleware, getAllCommentByPost);
+router.get("/allpost/:post_id", verifyTokenMiddleware, getAllCommentByPost);
 
 /**
  * @swagger
- * /comment/{user_id}:
+ * /comment/user/{user_id}:
  *   get:
  *     summary: Récupérer tous les commentaires d'un utilisateur
- *     description: Retourne tous les commentaires postés par un utilisateur spécifique.
- *     tags:
- *       - Commentaires
+ *     tags: [Comment]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: user_id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID de l'utilisateur
  *     responses:
  *       200:
@@ -69,37 +78,32 @@ router.get("/:post_id", verifyTokenMiddleware, getAllCommentByPost);
  *       500:
  *         description: Erreur serveur
  */
-router.get("/:user_id", verifyTokenMiddleware, getAllCommentByUser);
+router.get("/user/:user_id", verifyTokenMiddleware, getAllCommentByUser);
 
 /**
  * @swagger
  * /comment/{id}:
  *   put:
  *     summary: Modifier un commentaire
- *     description: Permet de modifier le contenu d'un commentaire existant.
- *     tags:
- *       - Commentaires
+ *     tags: [Comment]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID du commentaire à modifier
+ *           type: string
+ *         description: ID du commentaire
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - comment
  *             properties:
  *               comment:
  *                 type: string
- *                 description: Nouveau contenu du commentaire
  *     responses:
  *       200:
  *         description: Commentaire modifié avec succès
@@ -115,54 +119,56 @@ router.put("/:id", verifyTokenMiddleware, modifyComment);
  * /comment/{id}:
  *   delete:
  *     summary: Supprimer un commentaire
- *     description: Supprime un commentaire à partir de son ID.
- *     tags:
- *       - Commentaires
+ *     tags: [Comment]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID du commentaire à supprimer
+ *           type: string
+ *         description: ID du commentaire
  *     responses:
  *       200:
  *         description: Commentaire supprimé avec succès
+ *       400:
+ *         description: Utilisateur ou commentaire invalide
+ *       403:
+ *         description: Action non autorisée
  *       404:
  *         description: Commentaire non trouvé
  *       500:
  *         description: Erreur serveur
  */
-router.delete("/:id", deleteComment);
+router.delete("/:id", verifyTokenMiddleware, deleteComment);
 
 /**
  * @swagger
  * /comment/{id}:
  *   get:
  *     summary: Récupérer un commentaire par ID
- *     description: Retourne un commentaire spécifique en fonction de son ID.
- *     tags:
- *       - Commentaires
+ *     tags: [Comment]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID du commentaire
  *     responses:
  *       200:
  *         description: Commentaire trouvé
- *       404:
- *         description: Commentaire non trouvé
  *       500:
  *         description: Erreur serveur
  */
-router.get("/:id", verifyTokenMiddleware, getCommentById);
+router.get("/commentid/:id", verifyTokenMiddleware, getCommentById);
+
+
+router.delete("/admin/:id", isAdmin, deleteCommentAdmin)
+
 
 
 export default router

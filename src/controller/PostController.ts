@@ -68,13 +68,19 @@ export async function modifyPost(req: Request, res: Response) {
     }
 }
 
-export async function deletePost(req: Request, res: Response) {
+export async function deletePost(req: AuthRequest, res: Response) {
     try {
+        const user_id = req.user?.id;
         const { id } = req.params;
 
         const postUser = await Post.findByPk(id);
         if (!postUser) {
             res.status(404).json({ message: "Post non trouvé" });
+            return
+        }
+
+        if ((postUser.user_id) !== (user_id)) {
+            res.status(403).json({ message: "Vous ne pouvez supprimer que vos propres posts." });
             return
         }
 
@@ -107,4 +113,22 @@ export async function getAllPostByUser(req: Request, res: Response) {
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
+}
+
+export async function deletePostAdmin(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const postUser = await Post.findByPk(id);
+    if (!postUser) {
+      res.status(404).json({ message: "Post non trouvé" });
+      return
+    }
+
+    await postUser.destroy();
+    res.json({ message: "Commentaire supprimé avec succès par l'admin." });
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
 }

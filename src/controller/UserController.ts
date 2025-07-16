@@ -16,15 +16,13 @@ export async function register(req:Request, res:Response){
     try{
         const { god_id, pseudo, email, password, role, actif, etat, abonnement } = validateSchema(req, registerSchema);
         const { avatar, id} = req.body
-        //Erreur si les champs sont vides
+
         if(!pseudo || !email  || !password){
             res.status(400).send('Le champs name et password sont incomplets.');
             return 
         }
         
-        //Génération du mdp hashé
         const hashedPassword= await hashPassword(password);
-        //Création de l'utilisateur avec le role Modérateur
 
         const utilisateurExistant = await Utilisateur.findOne({ where: { email } });
         const dieuExistant = await God.findByPk(god_id);
@@ -38,13 +36,8 @@ export async function register(req:Request, res:Response){
         }
     
         const newUser = await Utilisateur.create({ id, god_id, avatar, pseudo, email,  hashedPassword, role, actif, etat, abonnement});
-        //Sauvegarde de l'utilisateur
         const savedUser= await newUser.save();
         savedUser.hashedPassword = '';
-
-        //Génération du token
-        const token = generateToken({id: savedUser.id, role: savedUser.role });
-    
         res.status(201).json({message: 'Utilisateur créé avec succès',data: savedUser});
     
     } catch(err:any){
@@ -59,10 +52,8 @@ export async function register(req:Request, res:Response){
 export async function login(req:Request, res:Response){
     try {
         const { pseudo, password } = validateSchema(req, loginSchema);
-        //Recherche de l'utilisateur par son nom
-         const user= await Utilisateur.findOne({ where: { pseudo } });
+        const user= await Utilisateur.findOne({ where: { pseudo } });
 
-         //Erreur si nom pas trouvé
         if(!user){
             res.status(404).json({message: 'Utilisateur non trouvé'});
             return 
@@ -73,21 +64,17 @@ export async function login(req:Request, res:Response){
             return         
         }
 
-        //Vérification du mot de passe hashé selon l'utilisateur
         const isPasswordValid= await verifyPassword(password,user.hashedPassword);
-        
-        
         if(!isPasswordValid){
             res.status(401).json({message: 'Mot de passe incorrect'});
             return 
         }
         const token = generateToken({id:user.id, role: user.role});
         console.log("DEBUG - Token généré :", token);
-        
-
-        // res.cookie('jwt',token,{httpOnly:true, sameSite:'strict'});
         res.cookie("jwt", token, {httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production"
         });
+
+        
         
         res.status(200).json({message: 'Connexion réussie', token, user: user.id});
         console.log("DEBUG - ID utilisateur utilisé pour la session :", user.id);

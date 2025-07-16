@@ -8,8 +8,8 @@ const router = express.Router();
  * /auth/register:
  *   post:
  *     summary: Inscription d'un utilisateur
- *     description: Crée un nouvel utilisateur et retourne un token d'authentification.
- *     tags: [Auth]
+ *     tags:
+ *       - Auth
  *     requestBody:
  *       required: true
  *       content:
@@ -17,72 +17,38 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - name
- *               - mail
+ *               - pseudo
+ *               - email
  *               - password
- *               - role
+ *               - god_id
  *             properties:
- *               name:
+ *               id:
  *                 type: string
- *                 example: "JohnDoe"
- *               mail:
+ *               god_id:
  *                 type: string
- *                 format: email
- *                 example: "john.doe@example.com"
+ *               pseudo:
+ *                 type: string
+ *               email:
+ *                 type: string
  *               password:
  *                 type: string
- *                 format: password
- *                 example: "StrongPass123!"
+ *               avatar:
+ *                 type: string
  *               role:
  *                 type: string
- *                 enum: ["Utilisateur", "Modérateur", "Admin"]
- *                 example: "Modérateur"
+ *               actif:
+ *                 type: string
+ *               etat:
+ *                 type: string
+ *               abonnement:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Utilisateur créé avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Utilisateur créé avec succès"
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: number
- *                       example: 1
- *                     name:
- *                       type: string
- *                       example: "JohnDoe"
- *                     mail:
- *                       type: string
- *                       example: "john.doe@example.com"
- *                     role:
- *                       type: string
- *                       example: "Modérateur"
  *       400:
- *         description: Requête invalide (champs manquants ou email déjà utilisé)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Nom ou email déjà utilisé"
+ *         description: Erreur de validation
  *       500:
- *         description: Erreur interne du serveur
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Erreur interne"
+ *         description: Erreur serveur
  */
 
 router.post('/register', register);
@@ -91,8 +57,9 @@ router.post('/register', register);
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Connecte un utilisateur existant avec un nom et un mot de passe
- *     tags: [Auth]
+ *     summary: Connexion d'un utilisateur
+ *     tags:
+ *       - Auth
  *     requestBody:
  *       required: true
  *       content:
@@ -100,64 +67,27 @@ router.post('/register', register);
  *           schema:
  *             type: object
  *             required:
- *               - name
+ *               - pseudo
  *               - password
  *             properties:
- *               name:
+ *               pseudo:
  *                 type: string
- *                 example: "Jean Dupont"
  *               password:
  *                 type: string
- *                 format: password
- *                 example: "Passw0rd!"
  *     responses:
  *       200:
- *         description: Connexion réussie avec génération d'un cookie JWT
- *         headers:
- *           Set-Cookie:
- *             description: Cookie contenant le token JWT
- *             schema:
- *               type: string
- *               example: jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; SameSite=Strict
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Connexion réussie"
+ *         description: Connexion réussie
  *       401:
  *         description: Mot de passe incorrect
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Mot de passe incorrect"
+ *       403:
+ *         description: Compte suspendu
  *       404:
  *         description: Utilisateur non trouvé
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Utilisateur non trouvé"
  *       500:
- *         description: Erreur interne du serveur
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Erreur interne"
+ *         description: Erreur serveur
  */
+
 router.post('/login', login);
+
 
 export default router;
