@@ -125,7 +125,7 @@ Utilisateur.init(
 );
 
 Utilisateur.belongsTo(God, {foreignKey: "god_id"});
-God.hasOne(Utilisateur, {foreignKey: "god_id", as: "god"});
+God.hasMany(Utilisateur, {foreignKey: "god_id", as: "god"});
 
 
 export default Utilisateur;

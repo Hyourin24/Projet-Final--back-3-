@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs/umd/types";
 import { login } from "../controller/UserController";
 import Utilisateur from "../models/Utilisateur.model"
 import { generateToken } from "../utils/JWTutils"
@@ -68,18 +69,20 @@ describe("login function", () => {
         expect(statusMock).toHaveBeenCalledWith(404);
         expect(jsonMock).toHaveBeenCalledWith({ message: "Utilisateur non trouvé" });
     });
-    it("devrait retourner une erreur 401 si le mot de passe est incorrect", async () => {
 
+    it("devrait retourner une erreur 401 si le mot de passe est incorrect", async () => {
         req.body = { pseudo: "Alito", password: "P@ssw0rd!" };
+
         (Utilisateur.findOne as jest.Mock).mockResolvedValue({
-            id: 1,
             pseudo: "Alito",
-            password: "P@ssw0rd!"
+            password: "autreMotDePasseHashé",
         });
 
-        (verifyPassword as jest.Mock).mockReturnValue(false);
+        (verifyPassword as jest.Mock).mockResolvedValue(false); // 👈 mot de passe incorrect
+
         await login(req, res);
+
         expect(statusMock).toHaveBeenCalledWith(401);
-        expect(jsonMock).toHaveBeenCalledWith({ message: "Mot de passe invalide" });
+        expect(jsonMock).toHaveBeenCalledWith({ message: "Mot de passe incorrect" });
     });
 })

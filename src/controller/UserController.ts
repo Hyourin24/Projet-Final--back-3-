@@ -77,8 +77,6 @@ export async function login(req:Request, res:Response){
             secure: process.env.NODE_ENV === "production"
         });
 
-        
-        
         res.status(200).json({message: 'Connexion réussie', token, user: user.id});
         console.log("DEBUG - ID utilisateur utilisé pour la session :", user.id);
 

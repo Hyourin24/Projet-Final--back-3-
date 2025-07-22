@@ -22,4 +22,4 @@ const syncDatabase = async () => {
         console.log("Modèles chargés dans Sequelize:", sequelize.models);
     }
 };
-export { syncDatabase,  Utilisateur, Follower, God, Session, Post, Commentaires, ChatSession, Chats};
+export { syncDatabase,  Utilisateur, Follower, God, Post, Commentaires};

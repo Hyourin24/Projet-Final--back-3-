@@ -15,6 +15,8 @@ import godRoute from './routes/godRoute';
 import cors from 'cors';
 import followRoute from './routes/followRoute';
 import chatRoute from './routes/chatRoute';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 cloudinary.config({
     cloud_name: 'dhsf409o1',
@@ -41,6 +43,34 @@ const server = app.listen(PORT, () => {
   console.log(`📡 Serveur HTTP + WebSocket lancé sur http://localhost:${PORT}`);
 });
 
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'nonce-random123'"],
+                styleSrc: ["'self'"], // Supprimer 'strict-dynamic'
+                imgSrc: ["'self'"], // Supprimer 'data:'
+                objectSrc: ["'none'"],
+                baseUri: ["'self'"],
+                formAction: ["'self'"],
+                frameAncestors: ["'none'"],
+                scriptSrcAttr: ["'none'"],
+                upgradeInsecureRequests: [],
+            },
+        },
+    })
+);
+
+
+export const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 20, 
+  message: "⛔ Trop de requêtes. Réessayez plus tard."
+});
+app.use(apiLimiter);
+
+
 
 
 app.use(express.json({ limit: '10mb' }));
@@ -65,7 +95,6 @@ app.use('/chatSession', chatSessionRoute)
 //port indiqu
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
 
 
 

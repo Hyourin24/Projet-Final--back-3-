@@ -3,7 +3,7 @@ import Joi from "joi";
 export const loginSchema = Joi.object({
     pseudo: Joi.string().min(3).max(30).required(),
     password: Joi.string().min(8).required()
-   });
+});
 
 // Définition du schéma de validation pour l'inscription
 export const registerSchema = Joi.object({
